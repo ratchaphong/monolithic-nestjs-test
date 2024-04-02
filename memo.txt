@@ -1,0 +1,22 @@
+nest new monolithic-rvp-test
+yarn add prisma --dev
+yarn add @prisma/client
+
+yarn prisma init
+yarn prisma migrate dev --name init
+yarn prisma generate
+
+yarn add @types/mime
+yarn prisma seed
+
+yarn add class-validator
+yarn add class-transformer
+yarn add @nestjs/swagger
+yarn add dotenv
+yarn add nodemon
+
+nest g module prisma && nest g service prisma
+nest g resource customerProfile
+
+yarn start
+yarn start:nodemon

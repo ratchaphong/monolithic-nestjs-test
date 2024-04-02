@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Occupation {
+  id                 String    @id @default(uuid()) @db.VarChar(255)
+  // id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code               String    @unique @db.VarChar(255)
+  nameTh             String    @db.VarChar(255)
+  nameEn             String?   @db.VarChar(255)
+  // effectiveStartDate DateTime  @default(now()) @db.Timestamptz(6)
+  effectiveStartDate DateTime  @default(now()) @db.Timestamp(6)
+  // effectiveEndDate   DateTime? @db.Timestamptz(6)
+  effectiveEndDate   DateTime? @db.Timestamp(6)
+  // createdAt DateTime @default(now()) @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @db.Timestamp(6)
+  // updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedAt          DateTime  @default(now()) @updatedAt @db.Timestamp(6)
+
+  @@map("Occupations")
+}
+
+model VerifyCard {
+  id                 String    @id @default(uuid()) @db.VarChar(255)
+  // id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // หรือใช้ประเภทข้อมูล INTEGER โดยใช้ Auto-increment
+  // id                 Int        @id @default(autoincrement()) @db.Int
+  code               String    @unique @db.VarChar(255)
+  nameTh             String    @db.VarChar(255)
+  nameEn             String?   @db.VarChar(255)
+  // effectiveStartDate DateTime  @default(now()) @db.Timestamptz(6)
+  effectiveStartDate DateTime  @default(now()) @db.Timestamp(6)
+  // effectiveEndDate   DateTime? @db.Timestamptz(6)
+  effectiveEndDate   DateTime? @db.Timestamp(6)
+  // createdAt DateTime @default(now()) @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @db.Timestamp(6)
+  // updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedAt          DateTime  @default(now()) @updatedAt @db.Timestamp(6)
+  // platforms          Platform[]
+  platforms          Json      @db.Json
+
+  @@map("VerifyCards")
+}
+
+model VehicleRegistrationType {
+  id                 String    @id @default(uuid()) @db.VarChar(255)
+  // id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code               String    @unique @db.VarChar(255)
+  // effectiveStartDate DateTime  @default(now()) @db.Timestamptz(6)
+  // effectiveEndDate   DateTime? @db.Timestamptz(6)
+  effectiveStartDate DateTime  @default(now()) @db.Timestamp(6)
+  effectiveEndDate   DateTime? @db.Timestamp(6)
+  nameTh             String    @db.VarChar(255)
+  nameEn             String?   @db.VarChar(255)
+  // createdAt          DateTime  @default(now()) @db.Timestamptz(6)
+  // updatedAt          DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime  @default(now()) @updatedAt @db.Timestamp(6)
+
+  @@map("VehicleRegistrationTypes")
+}
+
+model CustomerProfile {
+  customerId String  @id @default(uuid()) @map("customer_profile_pk")
+  userId     String? @db.VarChar(36)
+  firstName  String? @db.VarChar(255)
+  lastName   String? @db.VarChar(255)
+  email      String? @db.VarChar(255)
+  username   String? @db.VarChar(255)
+  password   String? @db.VarChar(255)
+
+  @@index([userId], map: "customer_profile_user_id_idx_1")
+}
+
+enum Platform {
+  DIRECT_WEB
+  E_AGENT
+}
