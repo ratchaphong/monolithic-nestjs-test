@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CustomerProfile } from '@prisma/client';
-import { Exclude, Expose, Type } from 'class-transformer';
 
-@Exclude()
 export class CustomerProfileEntity implements CustomerProfile {
   constructor(partial: Partial<CustomerProfileEntity>) {
     Object.assign(this, partial);
@@ -13,23 +11,13 @@ export class CustomerProfileEntity implements CustomerProfile {
     example: 'Customer ID',
     type: String,
   })
-  @Expose()
   customerId: string;
-
-  @ApiProperty({
-    description: 'User ID',
-    example: 'User ID',
-    type: String,
-  })
-  @Expose()
-  userId: string;
 
   @ApiProperty({
     description: 'First Name',
     example: 'A',
     type: String,
   })
-  @Expose()
   firstName: string;
 
   @ApiProperty({
@@ -37,7 +25,6 @@ export class CustomerProfileEntity implements CustomerProfile {
     example: 'B',
     type: String,
   })
-  @Expose()
   lastName: string;
 
   @ApiProperty({
@@ -45,22 +32,26 @@ export class CustomerProfileEntity implements CustomerProfile {
     example: 'a@gmail.com',
     type: String,
   })
-  @Expose()
   email: string;
 
   @ApiProperty({
-    description: 'Username',
-    example: 'username',
+    description: 'User ID',
+    example: 'User ID',
     type: String,
   })
-  @Expose()
+  userId: string;
+
+  @ApiProperty({
+    description: 'Username',
+    example: 'Username',
+    type: String,
+  })
   username: string;
 
   @ApiProperty({
     description: 'Password',
-    example: '1234',
+    example: 'Password',
     type: String,
   })
-  @Expose()
   password: string;
 }

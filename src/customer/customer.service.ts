@@ -8,21 +8,20 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CreateCustomerProfileDto } from './dto/create-customer-profile.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { CreateCustomerProfileResponseEntity } from './entities/create-customer-profile-response.entity';
-import { CustomerProfileEntity } from './entities/customer-profile.entity';
-import { CustomerProfileListResponseEntity } from './entities/customer-profile-list-response.entity';
+import { SearchCustomerProfilesResponseEntity } from './entities/search-customer-profiles-response.entity';
 import { CustomerProfile, Prisma } from '@prisma/client';
 import { LoginResponseEntity } from './entities/login-response.entity';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { GenerateTokenDto } from './dto/generate-token.dto';
-import { CustomerProfileResponseEntity } from './entities/customer-profile-response.entity';
 import { UpdateCustomerProfileDto } from './dto/update-customer-profile.dto';
+import { CreateCustomerProfileEntity } from './entities/create-customer-profile.entity';
+import { SearchCustomerProfileEntity } from './entities/search-customer-profile.entity';
+import { SearchCustomerProfileResponseEntity } from './entities/search-customer-profile-response.entity';
 
 @Injectable()
 export class CustomerService {
@@ -64,19 +63,38 @@ export class CustomerService {
     const profile = await this.prismaService.customerProfile.create({
       data: { ...req, password: hashedPassword },
     });
-    return { profile: new CustomerProfileEntity(profile) };
+    return { profile: new CreateCustomerProfileEntity(profile) };
   }
 
-  async findAll(): Promise<CustomerProfileListResponseEntity> {
-    const customerProfiles: Array<CustomerProfile> =
+  async findAll(): Promise<SearchCustomerProfilesResponseEntity> {
+    const customerProfiles: CustomerProfile[] =
       await this.prismaService.customerProfile.findMany({
         // orderBy: { sequence: 'asc' },
       });
 
+    // return {
+    //   profiles: customerProfiles.map((profile: CustomerProfile) => {
+    //     const { username, password, userId, ...data } = profile;
+    //     return new SearchCustomerProfilesEntity(data);
+    //   }),
+    // };
     return {
       profiles: customerProfiles.map(
-        (e: CustomerProfile) => new CustomerProfileEntity(e),
+        (e: CustomerProfile) => new SearchCustomerProfileEntity(e),
       ),
+    };
+  }
+
+  async findOne(
+    customerId: string,
+  ): Promise<SearchCustomerProfileResponseEntity> {
+    const customerProfile: CustomerProfile =
+      await this.prismaService.customerProfile.findUnique({
+        where: { customerId },
+      });
+
+    return {
+      profile: new SearchCustomerProfileEntity(customerProfile),
     };
   }
 
@@ -114,17 +132,6 @@ export class CustomerService {
     return this.jwtService.sign(payload);
   }
 
-  async findOne(customerId: string): Promise<CustomerProfileResponseEntity> {
-    const customerProfile: CustomerProfile =
-      await this.prismaService.customerProfile.findUnique({
-        where: { customerId },
-      });
-
-    return {
-      profile: customerProfile,
-    };
-  }
-
   async update(
     customerId: string,
     updateCustomerProfile: UpdateCustomerProfileDto,
@@ -155,7 +162,7 @@ export class CustomerService {
     console.log(response);
   }
 
-  async remove(customerId: string) {
+  async remove(customerId: string): Promise<void> {
     const existingUser = await this.prismaService.customerProfile.findFirst({
       where: { customerId },
     });

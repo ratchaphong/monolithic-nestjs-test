@@ -83,7 +83,33 @@ model CustomerProfile {
   @@index([userId], map: "customer_profile_user_id_idx_1")
 }
 
+model Consent {
+  // id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id           String    @id @default(uuid()) @db.VarChar(255)
+  name         String    @db.VarChar(255)
+  sequence     Int       @db.SmallInt
+  category     String    @db.VarChar(255)
+  consentType  String    @db.VarChar(255)
+  // state           HelpToolState
+  state        String    @db.VarChar(255)
+  startAt      DateTime? @db.Timestamp(6)
+  endAt        DateTime? @db.Timestamp(6)
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamp(6)
+  deletedAt    DateTime? @db.Timestamp(6)
+  actionBy     String    @db.VarChar(255)
+  actionUserId String?   @db.VarChar(255)
+  // consentContents ConsentContent[]
+
+  @@map("Consents")
+}
+
 enum Platform {
   DIRECT_WEB
   E_AGENT
+}
+
+enum HelpToolState {
+  ONLINE
+  OFFLINE
 }

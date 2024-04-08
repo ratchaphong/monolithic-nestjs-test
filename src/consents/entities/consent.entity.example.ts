@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Consent } from '@prisma/client';
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
+@Exclude()
 export class ConsentEntity implements Consent {
   constructor(partial: Partial<ConsentEntity>) {
     Object.assign(this, partial);
@@ -24,8 +25,8 @@ export class ConsentEntity implements Consent {
   name: string;
 
   @ApiProperty({
-    description: 'Category',
-    example: 'Category',
+    description: 'First Name',
+    example: 'First Name',
     type: String,
   })
   @Expose()
@@ -92,7 +93,6 @@ export class ConsentEntity implements Consent {
     example: new Date(),
     type: Date,
   })
-  @Expose()
   actionBy: string;
 
   @ApiProperty({
@@ -100,7 +100,6 @@ export class ConsentEntity implements Consent {
     example: new Date(),
     type: Date,
   })
-  @Expose()
   actionUserId: string;
 
   @ApiProperty({
@@ -108,6 +107,5 @@ export class ConsentEntity implements Consent {
     example: new Date(),
     type: Date,
   })
-  @Expose()
   deletedAt: Date;
 }
