@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Consent } from '@prisma/client';
 import { Expose } from 'class-transformer';
 
+@Expose()
 export class ConsentEntity implements Consent {
   constructor(partial: Partial<ConsentEntity>) {
     Object.assign(this, partial);
@@ -12,7 +13,6 @@ export class ConsentEntity implements Consent {
     example: 'Id',
     type: String,
   })
-  @Expose()
   id: string;
 
   @ApiProperty({
@@ -20,7 +20,6 @@ export class ConsentEntity implements Consent {
     example: 'Name',
     type: String,
   })
-  @Expose()
   name: string;
 
   @ApiProperty({
@@ -28,7 +27,6 @@ export class ConsentEntity implements Consent {
     example: 'Category',
     type: String,
   })
-  @Expose()
   category: string;
 
   @ApiProperty({
@@ -36,7 +34,6 @@ export class ConsentEntity implements Consent {
     example: 'Consent Type',
     type: String,
   })
-  @Expose()
   consentType: string;
 
   @ApiProperty({
@@ -44,7 +41,6 @@ export class ConsentEntity implements Consent {
     example: 'State',
     type: String,
   })
-  @Expose()
   state: string;
 
   @ApiProperty({
@@ -52,7 +48,6 @@ export class ConsentEntity implements Consent {
     example: 1,
     type: Number,
   })
-  @Expose()
   sequence: number;
 
   @ApiProperty({
@@ -60,54 +55,47 @@ export class ConsentEntity implements Consent {
     example: new Date(),
     type: Date,
   })
-  @Expose()
   endAt: Date;
 
   @ApiProperty({
-    description: 'วันสิ้นสุดการใช้งาน',
+    description: 'วันเริ่มต้นการใช้งาน',
     example: new Date(),
     type: Date,
   })
-  @Expose()
   startAt: Date;
 
   @ApiProperty({
-    description: 'วันสิ้นสุดการใช้งาน',
+    description: 'วันที่สร้าง',
     example: new Date(),
     type: Date,
   })
-  @Expose()
   createdAt: Date;
 
   @ApiProperty({
-    description: 'แก้ไขเมื่อ',
+    description: 'วันที่แก้ไข',
     example: new Date(),
     type: Date,
   })
-  @Expose()
   updatedAt: Date;
 
   @ApiProperty({
-    description: 'Action By',
+    description: 'ผู้ดำเนินการ',
     example: new Date(),
     type: Date,
   })
-  @Expose()
   actionBy: string;
 
   @ApiProperty({
-    description: 'Action User Id',
+    description: 'ผู้ใช้ที่ดำเนินการ',
     example: new Date(),
     type: Date,
   })
-  @Expose()
   actionUserId: string;
 
   @ApiProperty({
-    description: 'วันที่ลบรายการ',
+    description: 'วันที่ลบ',
     example: new Date(),
     type: Date,
   })
-  @Expose()
   deletedAt: Date;
 }
