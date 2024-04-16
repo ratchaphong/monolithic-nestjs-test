@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Consent } from '@prisma/client';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ConsentContentEntity } from './consent-content.entity';
 
 @Expose()
 export class ConsentEntity implements Consent {
@@ -98,4 +99,12 @@ export class ConsentEntity implements Consent {
     type: Date,
   })
   deletedAt: Date;
+
+  // @ApiProperty({
+  //   description: 'Consent Contents',
+  //   type: ConsentContentEntity,
+  //   isArray: true,
+  // })
+  // @Type(() => ConsentContentEntity)
+  // consentContents: ConsentContentEntity[];
 }

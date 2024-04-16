@@ -13,12 +13,14 @@ import {
 import { ConsentsService } from './consents.service';
 import { CreateConsentDto } from './dto/create-consent.dto';
 import { UpdateConsentDto } from './dto/update-consent.dto';
-import { ApiBearerAuth, ApiTags, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiBody, ApiParam } from '@nestjs/swagger';
 import { CreateConsentResponseEntity } from './entities/create-consent-response.entity';
 import { ApiOkRes } from '../decorators/api-ok.decorator';
 import { SearchConsentsResponseEntity } from './entities/search-consents-response.entity';
 import { SearchConsentsQueryDto } from './dto/query-search-consents.dto';
 import { Public } from '../guards/jwt-auth.guard.utils';
+import { SearchConsentResponseEntity } from './entities/search-consent-response.entity';
+import { UpdateConsentResponseEntity } from './entities/update-consent-response.entity';
 
 @Controller({ version: '1', path: 'consents' })
 @ApiTags('Consents')
@@ -51,15 +53,42 @@ export class ConsentsController {
     return await this.consentsService.findAll(query);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.consentsService.findOne(+id);
-  // }
+  @Get(':id')
+  @Public()
+  @ApiParam({
+    name: 'id',
+    description: 'uuid',
+    example: '939765c4-bcab-4c4b-96db-23fc7bc1071c',
+    type: String,
+  })
+  @ApiOkRes(SearchConsentResponseEntity, {
+    description: 'get consent',
+    status: HttpStatus.OK,
+  })
+  async findOne(@Param('id') id: string): Promise<SearchConsentResponseEntity> {
+    return await this.consentsService.findOne(id);
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateConsentDto: UpdateConsentDto) {
-  //   return this.consentsService.update(+id, updateConsentDto);
-  // }
+  @Patch(':id')
+  @ApiParam({
+    name: 'id',
+    description: 'uuid',
+    example: '939765c4-bcab-4c4b-96db-23fc7bc1071c',
+    type: String,
+  })
+  @ApiBody({ type: UpdateConsentDto, description: 'request body' })
+  @ApiOkRes(UpdateConsentResponseEntity, {
+    description: 'The data has been successfully updated.',
+  })
+  update(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() updateConsentDto: UpdateConsentDto,
+  ): Promise<SearchConsentResponseEntity> {
+    const { customerId } = req.user;
+
+    return this.consentsService.update(id, customerId, updateConsentDto);
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {

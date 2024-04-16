@@ -85,31 +85,51 @@ model CustomerProfile {
 
 model Consent {
   // id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id           String    @id @default(uuid()) @db.VarChar(255)
-  name         String    @db.VarChar(255)
-  sequence     Int       @db.SmallInt
-  category     String    @db.VarChar(255)
-  consentType  String    @db.VarChar(255)
+  id              String           @id @default(uuid()) @db.VarChar(255)
+  name            String           @db.VarChar(255)
+  sequence        Int              @db.SmallInt
+  category        String           @db.VarChar(255)
+  consentType     String           @db.VarChar(255)
   // state           HelpToolState
-  state        String    @db.VarChar(255)
-  startAt      DateTime? @db.Timestamp(6)
-  endAt        DateTime? @db.Timestamp(6)
-  createdAt    DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamp(6)
-  deletedAt    DateTime? @db.Timestamp(6)
-  actionBy     String    @db.VarChar(255)
-  actionUserId String?   @db.VarChar(255)
-  // consentContents ConsentContent[]
+  state           String           @db.VarChar(255)
+  startAt         DateTime?        @db.Timestamp(6)
+  endAt           DateTime?        @db.Timestamp(6)
+  createdAt       DateTime         @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime         @default(now()) @updatedAt @db.Timestamp(6)
+  deletedAt       DateTime?        @db.Timestamp(6)
+  actionBy        String           @db.VarChar(255)
+  actionUserId    String?          @db.VarChar(255)
+  consentContents ConsentContent[]
+  // One-to-Many สำหรับ ConsentContent
 
   @@map("Consents")
 }
 
-enum Platform {
-  DIRECT_WEB
-  E_AGENT
+model ConsentContent {
+  // id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                String    @id @default(uuid()) @db.VarChar(255)
+  header            String    @db.VarChar(255)
+  content           String    @db.VarChar(255)
+  acceptMsg         String    @db.VarChar(255)
+  isRequireAccepted Boolean   @default(false)
+  createdAt         DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime  @default(now()) @updatedAt @db.Timestamp(6)
+  deletedAt         DateTime? @db.Timestamp(6)
+  consentId         String    @default(uuid()) @db.VarChar(255)
+  consent           Consent   @relation(fields: [consentId], references: [id])
+  // ตัวอ้างอิงจาก Consent
+  // consentId ที่ใช้เป็น foreign key ในการเชื่อมโยงกับ Consent และใช้ @relation directive 
+  // เพื่อระบุความสัมพันธ์กับ Consent ด้วยฟิลด์ id ของ Consent
+
+  @@map("ConsentContents")
 }
 
-enum HelpToolState {
-  ONLINE
-  OFFLINE
-}
+// enum Platform {
+//   DIRECT_WEB
+//   E_AGENT
+// }
+
+// enum HelpToolState {
+//   ONLINE
+//   OFFLINE
+// }

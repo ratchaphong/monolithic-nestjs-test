@@ -1,27 +1,47 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { ConsentEntity } from './consent.entity';
 import { Exclude, Type } from 'class-transformer';
+import { ConsentEntity } from './consent.entity';
 import { CreateConsentContentEntity } from './create-consent-content.entity';
 
-export class CreateConsentEntity extends OmitType(ConsentEntity, [
-  'deletedAt',
+export class SearchConsentEntity extends OmitType(ConsentEntity, [
+  'endAt',
+  'startAt',
   'updatedAt',
+  'actionBy',
+  'actionUserId',
+  'deletedAt',
+  'createdAt',
 ]) {
   @Exclude()
-  deletedAt: Date;
+  endAt: Date;
+
+  @Exclude()
+  startAt: Date;
 
   @Exclude()
   updatedAt: Date;
 
+  @Exclude()
+  actionBy: string;
+
+  @Exclude()
+  actionUserId: string;
+
+  @Exclude()
+  deletedAt: Date;
+
+  @Exclude()
+  createdAt: Date;
+
   @ApiProperty({
-    description: 'Consent Contents',
+    description: 'Search Consent Contents',
     type: CreateConsentContentEntity,
     isArray: true,
   })
   @Type(() => CreateConsentContentEntity)
   consentContents: CreateConsentContentEntity[];
 
-  constructor(data: CreateConsentEntity) {
+  constructor(data: SearchConsentEntity) {
     super(data);
     Object.assign(this, data);
   }

@@ -1,7 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsDate,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { DateUtility } from '../../shares/date-utility';
+import { ConsentContentDto } from './consent-content.dto';
 
 export class CreateConsentDto {
   @ApiProperty({
@@ -72,13 +79,13 @@ export class CreateConsentDto {
   @IsNotEmpty()
   actionBy: string;
 
-  //   @ApiProperty({
-  //     description: 'เนื้อหาของ Consent',
-  //     type: ConsentContentDto,
-  //     isArray: true,
-  //   })
-  //   @IsOptional()
-  //   @Type(() => ConsentContentDto)
-  //   @ValidateNested({ each: true })
-  //   contents: ConsentContentDto[];
+  @ApiProperty({
+    description: 'เนื้อหาของ Consent',
+    type: ConsentContentDto,
+    isArray: true,
+  })
+  @Type(() => ConsentContentDto)
+  @IsOptional()
+  @ValidateNested({ each: true })
+  contents: ConsentContentDto[];
 }
