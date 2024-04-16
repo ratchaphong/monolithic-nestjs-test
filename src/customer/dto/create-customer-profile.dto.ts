@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsOptional } from 'class-validator';
+import { CreateAddressDto } from './create-address.dto';
 
 export class CreateCustomerProfileDto {
   @ApiProperty({
@@ -43,6 +44,14 @@ export class CreateCustomerProfileDto {
     description: 'รหัสผ่าน',
   })
   password: string;
+
+  @ApiProperty({
+    type: CreateAddressDto,
+    required: false, // ทำให้ address เป็น optional
+    description: 'ข้อมูลที่อยู่',
+  })
+  @IsOptional() // เพิ่ม IsOptional เพื่อระบุว่า address เป็น optional
+  address: CreateAddressDto;
 }
 
 // import { ApiProperty } from '@nestjs/swagger';

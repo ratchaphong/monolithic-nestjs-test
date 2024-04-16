@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CustomerProfile } from '@prisma/client';
+import { CreateAddressDto } from '../dto/create-address.dto';
 
 export class CustomerProfileEntity implements CustomerProfile {
   constructor(partial: Partial<CustomerProfileEntity>) {
@@ -54,4 +55,10 @@ export class CustomerProfileEntity implements CustomerProfile {
     type: String,
   })
   password: string;
+
+  @ApiProperty({
+    description: 'Address',
+    type: CreateAddressDto,
+  })
+  address: CreateAddressDto;
 }

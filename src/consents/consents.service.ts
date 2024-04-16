@@ -3,16 +3,22 @@ import { CreateConsentDto } from './dto/create-consent.dto';
 import { UpdateConsentDto } from './dto/update-consent.dto';
 import { CreateConsentResponseEntity } from './entities/create-consent-response.entity';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Consent, Prisma, PrismaClient } from '@prisma/client';
 import { CreateConsentEntity } from './entities/create-consent.entity';
 import { SearchConsentsResponseEntity } from './entities/search-consents-response.entity';
 import { SearchConsentsQueryDto } from './dto/query-search-consents.dto';
 import { SearchConsentEntity } from './entities/search-consent.entity';
 import { SearchConsentResponseEntity } from './entities/search-consent-response.entity';
+import { ActionHistoryService } from '../action-history/action-history.service';
+import { ConsentHistoryEntity } from './entities/consent-history.entity';
+import { ConsentHistoriesResponseEntity } from './entities/consent-history-response.entity';
 
 @Injectable()
 export class ConsentsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private actionHistoryService: ActionHistoryService,
+  ) {}
 
   async create(
     customerId: string,
@@ -40,16 +46,16 @@ export class ConsentsService {
           },
         });
 
-        // const consentHistoryData = {
-        //   modelName: Prisma.ModelName.Consent,
-        //   modelId: consent.id,
-        //   actionType: ActionType.CREATE,
-        //   actionUserId: user.userUuid,
-        //   actionBy: props.actionBy,
-        //   remark: 'สร้าง consent ใหม่',
-        // };
+        const consentHistoryData = {
+          modelName: Prisma.ModelName.Consent,
+          modelId: createdData.id,
+          actionType: 'CREATE',
+          actionUserId: customerId,
+          actionBy: createConsentDto.actionBy,
+          remark: 'สร้าง consent ใหม่',
+        };
 
-        // await this.actionHistoryService.create(consentHistoryData, prisma);
+        await this.actionHistoryService.create(consentHistoryData);
 
         const existingConsent = await prisma.consent.findFirst({
           where: {
@@ -223,14 +229,68 @@ export class ConsentsService {
     return { consent: new SearchConsentEntity(updatedConsent) };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} consent`;
+  async remove(
+    id: Consent['id'],
+    remark: string = 'ลบ consent',
+  ): Promise<SearchConsentResponseEntity> {
+    const consent = await this.prismaService.consent.findFirst({
+      where: {
+        id: id,
+      },
+      include: {
+        consentContents: true,
+      },
+    });
+
+    if (!consent) {
+      return null;
+    }
+
+    await this.prismaService.$transaction(async (prisma: PrismaClient) => {
+      await prisma.consentContent.deleteMany({
+        where: {
+          consentId: consent.id,
+        },
+      });
+
+      await prisma.consent.delete({
+        where: {
+          id: consent.id,
+        },
+      });
+
+      await prisma.consent.updateMany({
+        where: { sequence: { gt: consent.sequence } },
+        data: { sequence: { decrement: 1 } },
+      });
+
+      const consentHistoryData = {
+        modelName: Prisma.ModelName.Consent,
+        modelId: consent.id,
+        actionType: 'CANCEL',
+        actionUserId: consent.actionUserId,
+        actionBy: consent.actionBy,
+        remark: remark,
+      };
+
+      await this.actionHistoryService.create(consentHistoryData);
+    });
+
+    return {
+      consent: consent ? new SearchConsentEntity(consent) : null,
+    };
   }
 
-  // async getHistory(id: Consent['id']) {
-  //   return await this.actionHistoryService.findMany(
-  //     Prisma.ModelName.Consent,
-  //     id,
-  //   );
-  // }
+  async getHistory(id: Consent['id']): Promise<ConsentHistoriesResponseEntity> {
+    const histories = await this.actionHistoryService.findAll(
+      Prisma.ModelName.Consent,
+      id,
+    );
+
+    return {
+      consentHistories: histories.map(
+        (history) => new ConsentHistoryEntity(history),
+      ),
+    };
+  }
 }

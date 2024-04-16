@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CustomerProfile } from '@prisma/client';
 import { Exclude } from 'class-transformer';
+import { CreateAddressDto } from '../dto/create-address.dto';
 
 export class CreateCustomerProfileEntity implements CustomerProfile {
   constructor(partial: Partial<CreateCustomerProfileEntity>) {
@@ -33,6 +34,13 @@ export class CreateCustomerProfileEntity implements CustomerProfile {
     type: String,
   })
   email: string;
+
+  // เพิ่ม property สำหรับ address
+  @ApiProperty({
+    description: 'Address',
+    type: CreateAddressDto, // ใช้ชนิดข้อมูล Address ที่ได้จาก Prisma
+  })
+  address: CreateAddressDto;
 
   // @ApiProperty({
   //   description: 'User ID',

@@ -21,6 +21,7 @@ import { SearchConsentsQueryDto } from './dto/query-search-consents.dto';
 import { Public } from '../guards/jwt-auth.guard.utils';
 import { SearchConsentResponseEntity } from './entities/search-consent-response.entity';
 import { UpdateConsentResponseEntity } from './entities/update-consent-response.entity';
+import { ConsentHistoriesResponseEntity } from './entities/consent-history-response.entity';
 
 @Controller({ version: '1', path: 'consents' })
 @ApiTags('Consents')
@@ -90,8 +91,22 @@ export class ConsentsController {
     return this.consentsService.update(id, customerId, updateConsentDto);
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.consentsService.remove(+id);
-  // }
+  @Delete(':id')
+  @ApiOkRes(SearchConsentResponseEntity, { description: 'delete consent' })
+  async remove(
+    @Param('id') id: string,
+    @Body('remark') remark?: string,
+  ): Promise<SearchConsentResponseEntity> {
+    return await this.consentsService.remove(id, remark);
+  }
+
+  @Get(':id/histories')
+  @ApiOkRes(ConsentHistoriesResponseEntity, {
+    description: 'get consent history',
+  })
+  async getHistory(
+    @Param('id') id: string,
+  ): Promise<ConsentHistoriesResponseEntity> {
+    return await this.consentsService.getHistory(id);
+  }
 }

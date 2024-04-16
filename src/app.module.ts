@@ -11,6 +11,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './guards/jwt-auth.guard.utils';
+import { ActionHistoryModule } from './action-history/action-history.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { jwtConstants } from './guards/jwt-auth.guard.utils';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1d' },
     }),
+    ActionHistoryModule,
   ],
   controllers: [AppController],
   providers: [

@@ -22,6 +22,7 @@ import { UpdateCustomerProfileDto } from './dto/update-customer-profile.dto';
 import { CreateCustomerProfileEntity } from './entities/create-customer-profile.entity';
 import { SearchCustomerProfileEntity } from './entities/search-customer-profile.entity';
 import { SearchCustomerProfileResponseEntity } from './entities/search-customer-profile-response.entity';
+import { CustomerProfileEntity } from './entities/customer-profile.entity';
 
 @Injectable()
 export class CustomerService {
@@ -58,10 +59,18 @@ export class CustomerService {
     //     'This phone number has already been registered.',
     //   );
     // }
-    const { password } = req;
+    const { password, address, ...rest } = req;
     const hashedPassword: string = await bcrypt.hash(password, 10);
+
     const profile = await this.prismaService.customerProfile.create({
-      data: { ...req, password: hashedPassword },
+      data: {
+        ...rest,
+        password: hashedPassword,
+        address: address ? { create: address } : undefined,
+      },
+      include: {
+        address: true,
+      },
     });
     return { profile: new CreateCustomerProfileEntity(profile) };
   }
@@ -69,6 +78,9 @@ export class CustomerService {
   async findAll(): Promise<SearchCustomerProfilesResponseEntity> {
     const customerProfiles: CustomerProfile[] =
       await this.prismaService.customerProfile.findMany({
+        include: {
+          address: true,
+        },
         // orderBy: { sequence: 'asc' },
       });
 
@@ -80,7 +92,7 @@ export class CustomerService {
     // };
     return {
       profiles: customerProfiles.map(
-        (e: CustomerProfile) => new SearchCustomerProfileEntity(e),
+        (e: CustomerProfileEntity) => new SearchCustomerProfileEntity(e),
       ),
     };
   }
@@ -88,9 +100,12 @@ export class CustomerService {
   async findOne(
     customerId: string,
   ): Promise<SearchCustomerProfileResponseEntity> {
-    const customerProfile: CustomerProfile =
+    const customerProfile: CustomerProfileEntity =
       await this.prismaService.customerProfile.findUnique({
         where: { customerId },
+        include: {
+          address: true,
+        },
       });
 
     return {
@@ -102,7 +117,7 @@ export class CustomerService {
     const { username, password } = loginDto;
 
     const user = await this.prismaService.customerProfile.findFirst({
-      where: { username: loginDto.username },
+      where: { username: username },
     });
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -148,11 +163,16 @@ export class CustomerService {
     }
 
     const email = updateCustomerProfile.email || existingUser.email;
-    const model: Prisma.CustomerProfileCreateInput = {
+    let model: Prisma.CustomerProfileUpdateInput = {
       email: email,
       firstName: updateCustomerProfile.firstName,
       lastName: updateCustomerProfile.lastName,
     };
+    if (updateCustomerProfile.address) {
+      model.address = {
+        update: updateCustomerProfile.address,
+      };
+    }
 
     const response = await this.prismaService.customerProfile.update({
       where: { customerId: existingUser.customerId },
